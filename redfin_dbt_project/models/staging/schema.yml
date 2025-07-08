@@ -1,0 +1,18 @@
+version: 2
+sources:
+  - name: public
+    tables:
+      - name: stg_redfin_sales
+models:
+  - name: stg_redfin_sales
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - address
+            - sold_date
+  - name: dim_property
+    columns:
+      - name: property_id
+        tests:
+          - not_null
+          - unique
