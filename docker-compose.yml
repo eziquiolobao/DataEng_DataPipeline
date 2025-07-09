@@ -18,7 +18,7 @@ services:
       - postgres
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-redfin}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/redfin}
       AIRFLOW__CORE__FERNET_KEY: ''
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     volumes:
@@ -28,7 +28,7 @@ services:
       - ./data:/opt/airflow/data
     ports:
       - '8080:8080'
-    command: ["bash", "-c", "airflow db upgrade && airflow users create --username airflow --password airflow --firstname Air --lastname Flow --role Admin --email example@example.com && airflow scheduler & airflow webserver"]
+    command: [bash", "-c",  "airflow db upgrade && \ airflow users create --username $AIRFLOW_USER --password $AIRFLOW_PASSWORD --firstname Air --lastname Flow --role Admin --email eziquio.lobao@gmail.com && \ airflow scheduler & airflow webserver"]
 
   dbt:
     image: python:3.9-slim
