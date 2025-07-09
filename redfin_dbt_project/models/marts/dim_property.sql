@@ -5,7 +5,7 @@ select
     row_number() over (order by address) as property_id,
     address,
     city,
-    state,
+    state_or_province as state,
     zip_code,
     latitude,
     longitude
