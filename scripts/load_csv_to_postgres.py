@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 from sqlalchemy import create_engine
-import psycopg2
 
 TABLE_NAME = 'stg_redfin_sales'
 
@@ -40,15 +39,6 @@ def load_csv(
 
     df = pd.read_csv(csv_path)
     df = clean_columns(df)
-
-    psycopg2_conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        user=db_user,
-        password=db_password,
-        dbname=db_name,
-    )
-    # You can use psycopg2_conn.cursor() here if needed
 
     engine = create_engine(
         f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
