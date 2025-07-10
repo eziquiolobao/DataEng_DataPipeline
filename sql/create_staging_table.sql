@@ -1,5 +1,7 @@
 -- DDL for staging table matching Redfin columns
-CREATE TABLE IF NOT EXISTS stg_redfin_sales (
+DROP TABLE IF EXISTS stg_redfin_sales;
+
+CREATE TABLE stg_redfin_sales (
     address TEXT,
     city TEXT,
     zip_code TEXT,

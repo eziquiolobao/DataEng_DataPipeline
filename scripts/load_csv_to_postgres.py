@@ -30,12 +30,12 @@ def load_csv(
     csv_path: str | None = None,
 ) -> None:
     """Load a CSV file into Postgres."""
-    db_host = db_host or os.getenv("POSTGRES_HOST", "localhost")
-    db_port = db_port or os.getenv("POSTGRES_PORT", "5432")
-    db_name = db_name or os.getenv("POSTGRES_DB", "eziquio")
-    db_user = db_user or os.getenv("POSTGRES_USER", "postgres")
-    db_password = db_password or os.getenv("POSTGRES_PASSWORD", "postgres")
-    csv_path = csv_path or os.getenv("REDFIN_CSV_PATH", "data/redfin_harvard_ma.csv")
+    db_host = db_host or os.getenv("POSTGRES_HOST")
+    db_port = db_port or os.getenv("POSTGRES_PORT")
+    db_name = db_name or os.getenv("POSTGRES_DB")
+    db_user = db_user or os.getenv("POSTGRES_USER")
+    db_password = db_password or os.getenv("POSTGRES_PASSWORD")
+    csv_path = csv_path or os.getenv("REDFIN_CSV_PATH")
 
     df = pd.read_csv(csv_path)
     df = clean_columns(df)

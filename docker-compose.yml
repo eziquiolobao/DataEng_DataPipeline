@@ -12,19 +12,18 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-eziquio}"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   airflow:
     image: apache/airflow:2.6.2
-    depends_on:
-      postgres:
-        condition: service_healthy
+    depends_on: 
+      - postgres
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/eziquio"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       AIRFLOW__CORE__FERNET_KEY: ''
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
       POSTGRES_HOST: postgres
@@ -37,6 +36,7 @@ services:
       - ./scripts:/opt/airflow/scripts
       - ./redfin_dbt_project:/opt/airflow/dbt
       - ./data:/opt/airflow/data
+    restart: always
     ports:
       - '8080:8080'
     command: ["bash", "-c",  "airflow db upgrade && airflow users create --username $AIRFLOW_USER --password $AIRFLOW_PASSWORD --firstname Air --lastname Flow --role Admin --email eziquio.lobao@gmail.com && airflow scheduler & airflow webserver"]
