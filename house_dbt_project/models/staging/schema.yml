@@ -1,6 +1,7 @@
 version: 2
 sources:
-  - name: public
+  - name: MA_HOUSES
+    schema: MA_HOUSES
     tables:
       - name: stg_house_sales
 models:

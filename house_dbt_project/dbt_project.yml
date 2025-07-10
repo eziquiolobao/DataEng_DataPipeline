@@ -8,8 +8,12 @@ target-path: 'target'
 models:
   house_dbt_project:
     staging:
+      +schema: ma_houses
+      +database: HOUSEMARKET
       +materialized: view
     marts:
+      +schema: ma_houses
+      +database: HOUSEMARKET
       +materialized: table
 
 seed-paths: ['seeds']

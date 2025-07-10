@@ -11,7 +11,7 @@ services:
     ports:
       - '5432:5432'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -30,19 +30,24 @@ services:
       SNOWFLAKE_SCHEMA: ${SNOWFLAKE_SCHEMA:-PUBLIC}
       SNOWFLAKE_ROLE: ${SNOWFLAKE_ROLE:-SYSADMIN}
     depends_on:
-      - airflow_db
+      airflow_db:
+        condition: service_healthy
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./scripts:/opt/airflow/scripts
       - ./house_dbt_project:/opt/airflow/dbt
       - ./data:/opt/airflow/data
+      - ./airflow/entrypoint.sh:/opt/airflow/entrypoint.sh
     restart: always
     ports:
       - '8080:8080'
-    command: ["bash", "-c",  "airflow db upgrade && airflow users create --username $AIRFLOW_USER --password $AIRFLOW_PASSWORD --firstname Air --lastname Flow --role Admin --email admin@example.com && airflow scheduler & airflow webserver"]
+    command: ["bash", "/opt/airflow/entrypoint.sh"]
 
   dbt:
     image: ghcr.io/dbt-labs/dbt-snowflake:1.7.0
+    platform: linux/amd64
+    env_file:
+      - .env
     environment:
       SNOWFLAKE_ACCOUNT: ${SNOWFLAKE_ACCOUNT}
       SNOWFLAKE_USER: ${SNOWFLAKE_USER}
@@ -55,10 +60,13 @@ services:
       - ./house_dbt_project:/app
       - ./data:/app/data
     working_dir: /app
-    command: tail -f /dev/null
+    entrypoint: sh
+    command: ["-c", "dbt deps && dbt build"]
 
   snowflake:
-    image: ghcr.io/snowflakedb/snowpark-python:latest
+    build:
+      context: .
+      dockerfile: dockerfile.snowpark
     environment:
       SNOWFLAKE_ACCOUNT: ${SNOWFLAKE_ACCOUNT}
       SNOWFLAKE_USER: ${SNOWFLAKE_USER}
@@ -71,4 +79,3 @@ services:
 
 volumes:
   pgdata:
-

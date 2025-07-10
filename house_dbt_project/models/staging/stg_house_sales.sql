@@ -1,1 +1,1 @@
-select * from {{ source('public', 'stg_house_sales') }}
+select * from {{ source('MA_HOUSES', 'stg_house_sales') }}
