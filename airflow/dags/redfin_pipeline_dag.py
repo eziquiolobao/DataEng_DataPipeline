@@ -25,6 +25,14 @@ dag = DAG(
 ingest_task = PythonOperator(
     task_id='ingest_csv',
     python_callable=load_csv,
+    op_kwargs={
+        'db_host': os.getenv('POSTGRES_HOST'),
+        'db_port': os.getenv('POSTGRES_PORT'),
+        'db_name': os.getenv('POSTGRES_DB'),
+        'db_user': os.getenv('POSTGRES_USER'),
+        'db_password': os.getenv('POSTGRES_PASSWORD'),
+        'csv_path': os.getenv('REDFIN_CSV_PATH'),
+    },
     dag=dag,
 )
 
