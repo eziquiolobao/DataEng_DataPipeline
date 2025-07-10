@@ -1,16 +1,7 @@
 import os
 import pandas as pd
-import sqlalchemy
 from sqlalchemy import create_engine
 import psycopg2
-
-# Get database credentials from environment variables
-DB_HOST = os.getenv('POSTGRES_HOST', 'localhost')
-DB_PORT = os.getenv('POSTGRES_PORT', '5432')
-DB_NAME = os.getenv('POSTGRES_DB', 'eziquio')
-DB_USER = os.getenv('POSTGRES_USER', 'postgres')
-DB_PASSWORD = os.getenv('POSTGRES_PASSWORD', 'postgres')
-CSV_PATH = os.getenv('REDFIN_CSV_PATH', 'data/redfin_harvard_ma.csv')
 
 TABLE_NAME = 'stg_redfin_sales'
 
@@ -18,7 +9,6 @@ TABLE_NAME = 'stg_redfin_sales'
 def clean_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Clean column names and convert data types."""
     df.columns = [c.strip().lower().replace(' ', '_') for c in df.columns]
-    # Basic datatype cleaning
     if 'sold_date' in df.columns:
         df['sold_date'] = pd.to_datetime(df['sold_date'], errors='coerce')
     if 'price' in df.columns:
@@ -32,27 +22,41 @@ def clean_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def load_csv():
-    df = pd.read_csv(CSV_PATH)
+def load_csv(
+    db_host: str | None = None,
+    db_port: str | None = None,
+    db_name: str | None = None,
+    db_user: str | None = None,
+    db_password: str | None = None,
+    csv_path: str | None = None,
+) -> None:
+    """Load a CSV file into Postgres."""
+    db_host = db_host or os.getenv("POSTGRES_HOST", "localhost")
+    db_port = db_port or os.getenv("POSTGRES_PORT", "5432")
+    db_name = db_name or os.getenv("POSTGRES_DB", "eziquio")
+    db_user = db_user or os.getenv("POSTGRES_USER", "postgres")
+    db_password = db_password or os.getenv("POSTGRES_PASSWORD", "postgres")
+    csv_path = csv_path or os.getenv("REDFIN_CSV_PATH", "data/redfin_harvard_ma.csv")
+
+    df = pd.read_csv(csv_path)
     df = clean_columns(df)
 
-    # Establish psycopg2 connection (optional, for direct use)
     psycopg2_conn = psycopg2.connect(
-        host=DB_HOST,
-        port=DB_PORT,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        dbname=DB_NAME
+        host=db_host,
+        port=db_port,
+        user=db_user,
+        password=db_password,
+        dbname=db_name,
     )
     # You can use psycopg2_conn.cursor() here if needed
 
     engine = create_engine(
-        f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
     )
     with engine.connect() as conn:
-        df.to_sql(TABLE_NAME, conn, if_exists='replace', index=False)
+        df.to_sql(TABLE_NAME, conn, if_exists="replace", index=False)
     print(f"Loaded {len(df)} rows into {TABLE_NAME}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     load_csv()
