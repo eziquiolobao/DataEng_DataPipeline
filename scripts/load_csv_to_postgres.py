@@ -7,7 +7,7 @@ import psycopg2
 # Get database credentials from environment variables
 DB_HOST = os.getenv('POSTGRES_HOST', 'localhost')
 DB_PORT = os.getenv('POSTGRES_PORT', '5432')
-DB_NAME = os.getenv('POSTGRES_DB', 'redfin')
+DB_NAME = os.getenv('POSTGRES_DB', 'eziquio')
 DB_USER = os.getenv('POSTGRES_USER', 'postgres')
 DB_PASSWORD = os.getenv('POSTGRES_PASSWORD', 'postgres')
 CSV_PATH = os.getenv('REDFIN_CSV_PATH', 'data/redfin_harvard_ma.csv')

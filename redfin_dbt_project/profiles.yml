@@ -7,6 +7,6 @@ redfin:
       user: {{ env_var('POSTGRES_USER', 'postgres') }}
       password: {{ env_var('POSTGRES_PASSWORD', 'postgres') }}
       port: {{ env_var('POSTGRES_PORT', '5432') }}
-      dbname: {{ env_var('POSTGRES_DB', 'redfin') }}
+      dbname: {{ env_var('POSTGRES_DB', 'eziquio') }}
       schema: public
       threads: 1
