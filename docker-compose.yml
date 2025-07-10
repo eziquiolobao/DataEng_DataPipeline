@@ -1,24 +1,29 @@
-version: '3.9'
 services:
   postgres:
     image: postgres:13
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-redfin}
+      POSTGRES_DB: redfin
     ports:
       - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-redfin}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   airflow:
     image: apache/airflow:2.6.2
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/redfin}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/redfin
       AIRFLOW__CORE__FERNET_KEY: ''
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     volumes:
@@ -28,7 +33,7 @@ services:
       - ./data:/opt/airflow/data
     ports:
       - '8080:8080'
-    command: [bash", "-c",  "airflow db upgrade && \ airflow users create --username $AIRFLOW_USER --password $AIRFLOW_PASSWORD --firstname Air --lastname Flow --role Admin --email eziquio.lobao@gmail.com && \ airflow scheduler & airflow webserver"]
+    command: ["bash", "-c",  "airflow db upgrade && airflow users create --username $AIRFLOW_USER --password $AIRFLOW_PASSWORD --firstname Air --lastname Flow --role Admin --email eziquio.lobao@gmail.com && airflow scheduler & airflow webserver"]
 
   dbt:
     image: python:3.9-slim
@@ -36,7 +41,7 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-redfin}
+      POSTGRES_DB: redfin
       POSTGRES_PORT: 5432
     volumes:
       - ./redfin_dbt_project:/app

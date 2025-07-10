@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import sqlalchemy
 from sqlalchemy import create_engine
+import psycopg2
 
 # Get database credentials from environment variables
 DB_HOST = os.getenv('POSTGRES_HOST', 'localhost')
@@ -34,6 +35,16 @@ def clean_columns(df: pd.DataFrame) -> pd.DataFrame:
 def load_csv():
     df = pd.read_csv(CSV_PATH)
     df = clean_columns(df)
+
+    # Establish psycopg2 connection (optional, for direct use)
+    psycopg2_conn = psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        dbname=DB_NAME
+    )
+    # You can use psycopg2_conn.cursor() here if needed
 
     engine = create_engine(
         f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
