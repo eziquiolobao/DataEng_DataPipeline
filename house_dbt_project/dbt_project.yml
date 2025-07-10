@@ -1,16 +1,15 @@
-name: 'redfin_dbt_project'
+name: 'house_dbt_project'
 version: '1.0'
 config-version: 2
 
-profile: 'redfin'
+profile: 'house'
 
 target-path: 'target'
 models:
-  redfin_dbt_project:
+  house_dbt_project:
     staging:
       +materialized: view
     marts:
       +materialized: table
 
-data-paths: ['data']
 seed-paths: ['seeds']

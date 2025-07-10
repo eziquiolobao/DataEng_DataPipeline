@@ -1,5 +1,5 @@
 with source as (
-    select * from {{ ref('stg_redfin_sales') }}
+    select * from {{ ref('stg_house_sales') }}
 )
 select
     row_number() over (order by address) as property_id,
