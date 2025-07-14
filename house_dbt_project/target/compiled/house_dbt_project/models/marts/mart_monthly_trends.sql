@@ -3,7 +3,7 @@ with base as (
 )
 , monthly as (
     select
-        date_trunc('month', sold_date) as month,
+        date_trunc('month', to_date(sold_date)) as month,
         sum(price) as total_sales,
         avg(price / nullif(square_feet,0)) as price_per_sqft
     from base

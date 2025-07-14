@@ -10,9 +10,9 @@ This project demonstrates an end-to-end data engineering pipeline using **Airflo
 
 ## Quickstart
 1. Ensure Docker and Docker Compose are installed.
-2. Place your Redfin CSV at `data/redfin_harvard_ma.csv` or set `REDFIN_CSV_PATH`.
+2. Place Redfin CSV at `data/redfin_harvard_ma.csv` or set `REDFIN_CSV_PATH`. 
 3. Run `docker-compose up` to start all services.
-4. Access Airflow at `http://localhost:8080` (default credentials: `airflow/airflow`).
+4. Access Airflow at `http://localhost:8080` (use docker exec -it dataeng_datapipeline-airflow-1 bash to create an user).
 5. Trigger the `house_sales_pipeline` DAG to load and transform the data.
 6. Set your Snowflake credentials via environment variables in `docker-compose.yml` or an `.env` file.
 

@@ -6,7 +6,10 @@ import os
 
 # Import the ingestion function
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
+# Add ../scripts (one directory up from /opt/airflow/dags) to PYTHONPATH
+script_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'scripts'))
+if script_dir not in sys.path:
+    sys.path.append(script_dir)
 from load_csv_to_snowflake import load_csv
 
 default_args = {

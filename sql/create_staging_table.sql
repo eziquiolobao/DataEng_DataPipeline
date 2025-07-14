@@ -7,12 +7,12 @@ CREATE OR REPLACE TABLE stg_house_sales (
     state_or_province VARCHAR,
     property_type VARCHAR,
     price NUMBER,
-    beds INTEGER,
+    beds NUMBER,
     baths NUMBER,
-    square_feet INTEGER,
-    sold_date DATE,
-    lot_size NUMBER,
-    year_built INTEGER,
+    square_feet NUMBER,
+    sold_date VARCHAR,
+    lot_size VARCHAR,
+    year_built NUMBER,
     latitude NUMBER,
     longitude NUMBER
 );

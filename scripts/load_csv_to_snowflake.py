@@ -33,8 +33,8 @@ def load_csv(
     password = password or os.getenv('SNOWFLAKE_PASSWORD')
     warehouse = warehouse or os.getenv('SNOWFLAKE_WAREHOUSE')
     database = database or os.getenv('SNOWFLAKE_DATABASE')
-    schema = schema or os.getenv('SNOWFLAKE_SCHEMA', 'PUBLIC')
-    role = role or os.getenv('SNOWFLAKE_ROLE', 'SYSADMIN')
+    schema = schema or os.getenv('SNOWFLAKE_SCHEMA')
+    role = role or os.getenv('SNOWFLAKE_ROLE')
     csv_path = csv_path or os.getenv('REDFIN_CSV_PATH')
 
     df = pd.read_csv(csv_path)
