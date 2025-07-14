@@ -1,0 +1,19 @@
+name: 'house_dbt_project'
+version: '1.0'
+config-version: 2
+
+profile: 'house'
+
+target-path: 'target'
+models:
+  house_dbt_project:
+    staging:
+      +schema: ma_houses
+      +database: HOUSEMARKET
+      +materialized: view
+    marts:
+      +schema: ma_houses
+      +database: HOUSEMARKET
+      +materialized: table
+
+seed-paths: ['seeds']

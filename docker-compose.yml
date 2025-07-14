@@ -1,59 +1,81 @@
 version: '3.9'
 services:
-  postgres:
+  airflow_db:
     image: postgres:13
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: eziquio
-    ports:
-      - '5432:5432'
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./sql:/docker-entrypoint-initdb.d
+    ports:
+      - '5432:5432'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
       interval: 5s
       timeout: 5s
       retries: 10
-
   airflow:
-    image: apache/airflow:2.6.2
-    depends_on: 
-      - postgres
+    image: apache/airflow:2.7.0-python3.10
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
       AIRFLOW__CORE__FERNET_KEY: ''
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      POSTGRES_HOST: postgres
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: eziquio
-      POSTGRES_PORT: 5432
+      SNOWFLAKE_ACCOUNT: ${SNOWFLAKE_ACCOUNT}
+      SNOWFLAKE_USER: ${SNOWFLAKE_USER}
+      SNOWFLAKE_PASSWORD: ${SNOWFLAKE_PASSWORD}
+      SNOWFLAKE_DATABASE: ${SNOWFLAKE_DATABASE}
+      SNOWFLAKE_WAREHOUSE: ${SNOWFLAKE_WAREHOUSE}
+      SNOWFLAKE_SCHEMA: ${SNOWFLAKE_SCHEMA:-PUBLIC}
+      SNOWFLAKE_ROLE: ${SNOWFLAKE_ROLE:-SYSADMIN}
+    depends_on:
+      airflow_db:
+        condition: service_healthy
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./scripts:/opt/airflow/scripts
-      - ./redfin_dbt_project:/opt/airflow/dbt
+      - ./house_dbt_project:/opt/airflow/dbt
       - ./data:/opt/airflow/data
+      - ./airflow/entrypoint.sh:/opt/airflow/entrypoint.sh
     restart: always
     ports:
       - '8080:8080'
-    command: ["bash", "-c",  "airflow db upgrade && airflow users create --username $AIRFLOW_USER --password $AIRFLOW_PASSWORD --firstname Air --lastname Flow --role Admin --email eziquio.lobao@gmail.com && airflow scheduler & airflow webserver"]
+    command: ["bash", "/opt/airflow/entrypoint.sh"]
 
   dbt:
-    image: python:3.9-slim
+    image: ghcr.io/dbt-labs/dbt-snowflake:1.7.0
+    platform: linux/amd64
+    env_file:
+      - .env
     environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: eziquio
-      POSTGRES_PORT: 5432
+      SNOWFLAKE_ACCOUNT: ${SNOWFLAKE_ACCOUNT}
+      SNOWFLAKE_USER: ${SNOWFLAKE_USER}
+      SNOWFLAKE_PASSWORD: ${SNOWFLAKE_PASSWORD}
+      SNOWFLAKE_WAREHOUSE: ${SNOWFLAKE_WAREHOUSE}
+      SNOWFLAKE_DATABASE: ${SNOWFLAKE_DATABASE}
+      SNOWFLAKE_SCHEMA: ${SNOWFLAKE_SCHEMA:-PUBLIC}
+      SNOWFLAKE_ROLE: ${SNOWFLAKE_ROLE:-SYSADMIN}
     volumes:
-      - ./redfin_dbt_project:/app
+      - ./house_dbt_project:/app
       - ./data:/app/data
     working_dir: /app
-    command: tail -f /dev/null
+    entrypoint: sh
+    command: ["-c", "dbt deps && dbt build"]
+
+  snowflake:
+    build:
+      context: .
+      dockerfile: dockerfile.snowpark
+    environment:
+      SNOWFLAKE_ACCOUNT: ${SNOWFLAKE_ACCOUNT}
+      SNOWFLAKE_USER: ${SNOWFLAKE_USER}
+      SNOWFLAKE_PASSWORD: ${SNOWFLAKE_PASSWORD}
+      SNOWFLAKE_WAREHOUSE: ${SNOWFLAKE_WAREHOUSE}
+      SNOWFLAKE_DATABASE: ${SNOWFLAKE_DATABASE}
+      SNOWFLAKE_SCHEMA: ${SNOWFLAKE_SCHEMA:-PUBLIC}
+      SNOWFLAKE_ROLE: ${SNOWFLAKE_ROLE:-SYSADMIN}
+    command: sleep infinity
 
 volumes:
   pgdata:

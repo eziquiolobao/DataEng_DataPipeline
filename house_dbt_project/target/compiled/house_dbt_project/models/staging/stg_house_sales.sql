@@ -1,0 +1,1 @@
+select * from HOUSEMARKET.MA_HOUSES.stg_house_sales

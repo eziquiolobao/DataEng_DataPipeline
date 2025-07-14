@@ -1,0 +1,19 @@
+version: 2
+sources:
+  - name: MA_HOUSES
+    schema: MA_HOUSES
+    tables:
+      - name: stg_house_sales
+models:
+  - name: stg_house_sales
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - address
+            - sold_date
+  - name: dim_property
+    columns:
+      - name: property_id
+        tests:
+          - not_null
+          - unique
