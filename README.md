@@ -1,6 +1,6 @@
 # Data Engineering Pipeline for Harvard, MA Home Sales
 
-This project demonstrates an end-to-end data engineering pipeline using **Airflow**, **dbt**, and **Snowflake** to analyze home sales data from Redfin.
+This project demonstrates an end-to-end data engineering pipeline using **Airflow**, **dbt**, **Docker Compose** and **Snowflake** to analyze home sales data from Redfin.
 
 ## Components
 - **Airflow** orchestrates the ingestion and transformation jobs.
