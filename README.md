@@ -52,4 +52,31 @@ Then serve docs:
 ```bash
 docker-compose run --service-ports dbt dbt docs serve
 ```
+## Screenshots
+
+Below are screenshots demonstrating the pipeline in action:
+
+### 1. Development in VS Code
+![VSCode Screenshot](VSCODE.jpeg)  
+This shows the `load_csv_to_snowflake.py` script and Docker logs with Airflow running.
+
+### 2. Snowflake Database Schema
+![Snowflake Schema](Snowflake.png)  
+Displays the `HOUSEMARKET` database with the `MA_HOUSES` schema and loaded tables.
+
+### 3. Snowflake Tables
+![Snowflake Tables](SF tables.png)  
+Tables created by the dbt models, including dimension, fact, and mart tables.
+
+### 4. Snowflake Data Preview
+![Snowflake Data](SF data.jpeg)  
+Sample output from the `HARVARD_SOLD_REDFIN` table with 3,100+ rows ingested.
+
+### 5. dbt Build Logs via Docker
+![dbt Logs](Docker_dbt.jpeg)  
+Logs from the `dbt run` showing successful model execution and testing inside the container.
+
+### 6. Airflow DAG Execution
+![Airflow UI](Airflow localhost.jpeg)  
+Airflow UI with the `house_sales_pipeline` DAG available and ready to run.
 
