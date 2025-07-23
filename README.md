@@ -1,6 +1,6 @@
-# Data Engineering Pipeline for Harvard, MA Home Sales
+# Data Engineering Pipeline for Harvard, MA House Sales
 
-This project demonstrates an end-to-end data engineering pipeline using **Airflow**, **dbt**, **Docker Compose** and **Snowflake** to analyze home sales data from Redfin.
+This project demonstrates an end-to-end data engineering pipeline using **Airflow**, **dbt**, **Docker Compose** and **Snowflake** to analyze house sales data in Harvard, MA. I used Python to web scrape data through RedFin's API and create the .csv file.
 
 ## Components
 - **Airflow** orchestrates the ingestion and transformation jobs.
@@ -28,12 +28,6 @@ To run dbt manually inside the container:
 docker-compose run dbt dbt run
 ```
 
-## Testing
-Run dbt tests:
-```bash
-docker-compose run dbt dbt test
-```
-
 ## Airflow DAG
 The DAG defined in `airflow/dags/redfin_pipeline_dag.py` performs:
 1. Load the CSV into Snowflake.
@@ -43,15 +37,6 @@ The DAG defined in `airflow/dags/redfin_pipeline_dag.py` performs:
 ## Snowflake Setup
 The table DDL can be found in `sql/create_staging_table.sql` and should be executed in your Snowflake account before running the pipeline.
 
-## Documentation
-Generate dbt docs:
-```bash
-docker-compose run dbt dbt docs generate
-```
-Then serve docs:
-```bash
-docker-compose run --service-ports dbt dbt docs serve
-```
 ## Screenshots
 
 Below are screenshots demonstrating the pipeline in action:
