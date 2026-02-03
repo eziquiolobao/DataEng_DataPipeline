@@ -43,7 +43,7 @@ ingest_task = PythonOperator(
 
 dbt_task = BashOperator(
     task_id='dbt_run',
-    bash_command='cd /opt/airflow/dbt && dbt run',
+    bash_command='cd /opt/airflow/dbt && dbt deps && dbt run --profiles-dir /opt/airflow/dbt',
     dag=dag,
 )
 

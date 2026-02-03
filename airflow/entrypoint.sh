@@ -3,6 +3,9 @@
 # Wait for the DB to be up
 sleep 10
 
+# Install Python dependencies for Snowflake
+pip install pandas snowflake-connector-python[pandas] --quiet
+
 # Initialize the DB (only if needed)
 airflow db upgrade
 

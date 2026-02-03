@@ -37,6 +37,22 @@ def load_csv(
     role = role or os.getenv('SNOWFLAKE_ROLE')
     csv_path = csv_path or os.getenv('REDFIN_CSV_PATH')
 
+    # Validate required parameters
+    missing = []
+    if not account:
+        missing.append('SNOWFLAKE_ACCOUNT')
+    if not user:
+        missing.append('SNOWFLAKE_USER')
+    if not password:
+        missing.append('SNOWFLAKE_PASSWORD')
+    if not csv_path:
+        missing.append('REDFIN_CSV_PATH')
+    if missing:
+        raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
+
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"CSV file not found: {csv_path}")
+
     df = pd.read_csv(csv_path)
     df = clean_columns(df)
 
